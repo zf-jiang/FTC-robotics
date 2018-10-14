@@ -1,8 +1,11 @@
 # MathisonFTC
 
-Repository used for Mathison Academy for participation in the 2019 FIRST Tech Challenge ROVER RUCKUS.
+Organization name: Mathison Academy
 
-Development environment is Android Studio using Java.
+Repository used to create the FTC Robot Controller App the 2019 FIRST Tech Challenge ROVER RUCKUS.
+
+Development environment is Android Studio using Java. 
+Source code SDK taken from 'https://github.com/ftctechnh/ftc_app'.
 
 Team Members (non-exhaustive):
 * Miles Wu (Coach)
