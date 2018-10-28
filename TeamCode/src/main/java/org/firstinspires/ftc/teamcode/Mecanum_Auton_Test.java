@@ -32,30 +32,22 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+// import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.ElapsedTime;
+// import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@Autonomous(name="BaseLinearOpmode", group="Linear Opmode")
+@Autonomous(name="TestAuton", group="Linear Opmode") // or @TeleOp
 //@Disabled
-public class Auton_ForwardTest extends LinearOpMode {
+public class Mecanum_Auton_Test extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
+    // 4WD Mecanum wheel drive base
+    private DcMotor frontLeftDrive = null;
+    private DcMotor frontRightDrive = null;
+    private DcMotor rearLeftDrive = null;
+    private DcMotor rearRightDrive = null;
 
     double power = 0.5; // range -1 to 1
 
@@ -67,25 +59,67 @@ public class Auton_ForwardTest extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        frontLeftDrive  = hardwareMap.get(DcMotor.class, "front_left_drive");
+        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right_drive");
+        rearLeftDrive = hardwareMap.get(DcMotor.class, "rear_left_drive");
+        rearRightDrive = hardwareMap.get(DcMotor.class, "rear_right_drive");
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        // Set motor direction for initial movement
+        // Motor directions for 4WD mecanum wheel movement:
+        // Forward 90 degrees
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        rearLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rearRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        /*
+        // Right 0 degrees
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        rearLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rearRightDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        // Diagonal 45 degrees
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        // frontRightDrive.setDirection(DcMotor.Direction.FORWARD); power = 0 (no movement)
+        // rearLeftDrive.setDirection(DcMotor.Direction.FORWARD); power = 0 (no movement)
+        rearRightDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        // Pivot -90 degree turn (pivot point @ rear right wheel)
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        // frontRightDrive.setDirection(DcMotor.Direction.FORWARD); power = 0 (no movement)
+        rearLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        // rearRightDrive.setDirection(DcMotor.Direction.FORWARD); power = 0 (no movement)
+
+        // Rotational -180 degree turn
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        rearLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rearRightDrive.setDirection(DcMotor.Direction.REVERSE);
+
+        // Rotational -90 degree turn (non-pivot, rear axis turn)
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        // rearLeftDrive.setDirection(DcMotor.Direction.FORWARD); power = 0 (no movement)
+        // rearRightDrive.setDirection(DcMotor.Direction.FORWARD); power = 0 (no movement)
+        */
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        leftDrive.setPower(power);
-        rightDrive.setPower(power);
-
+        // Move forward 2 seconds
+        frontLeftDrive.setPower(power);
+        frontRightDrive.setPower(power);
+        rearLeftDrive.setPower(power);
+        rearRightDrive.setPower(power);
         sleep(2000);
+
+        // Stop movement
         power = 0.0;
-        leftDrive.setPower(power);
-        rightDrive.setPower(power);
+        frontLeftDrive.setPower(power);
+        frontRightDrive.setPower(power);
+        rearLeftDrive.setPower(power);
+        rearRightDrive.setPower(power);
 
         /*
         // run until the end of the match (driver presses STOP)
