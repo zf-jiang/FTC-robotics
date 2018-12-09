@@ -33,16 +33,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-@TeleOp(name="MecanumTeleOp", group="Iterative Opmode")
+@TeleOp(name="MecanumVectorTO", group="Iterative Opmode")
 //@Disabled
-
-public class MecanumTeleOp extends OpMode
+public class MecanumVectorTO extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -52,13 +51,15 @@ public class MecanumTeleOp extends OpMode
     private DcMotor backLeftMotor = null;
     private DcMotor backRightMotor = null;
 
+    // private static final double TRIGGERTHRESHOLD = .2;
+    private static final double ACCEPTINPUTTHRESHOLD = .15;
+    private static final double SCALEDPOWER = 1; //Emphasis on current controller reading (vs current motor power) on the drive train
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
-
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
@@ -67,6 +68,8 @@ public class MecanumTeleOp extends OpMode
         backLeftMotor = hardwareMap.get(DcMotor.class, "rear_left_drive");
         backRightMotor = hardwareMap.get(DcMotor.class, "rear_right_drive");
 
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -92,17 +95,37 @@ public class MecanumTeleOp extends OpMode
      */
     @Override
     public void loop() {
-        // Convert joysticks to desired motion.
-        Mecanum.Motion motion = Mecanum.joystickToMotion(
-                gamepad1.left_stick_x, gamepad1.left_stick_y,
-                gamepad1.right_stick_x, gamepad1.right_stick_y);
+        double inputY = Math.abs(gamepad1.left_stick_y) > ACCEPTINPUTTHRESHOLD ? gamepad1.left_stick_y : 0;
+        double inputX = Math.abs(gamepad1.left_stick_x) > ACCEPTINPUTTHRESHOLD ? -gamepad1.left_stick_x : 0;
+        double inputC = Math.abs(gamepad1.right_stick_x)> ACCEPTINPUTTHRESHOLD ? -gamepad1.right_stick_x: 0;
 
-        // Convert desired motion to wheel powers, with power clamping.
-        Mecanum.Wheels wheels = Mecanum.motionToWheels(motion);
-        frontLeftMotor.setPower(wheels.frontLeft);
-        frontRightMotor.setPower(wheels.frontRight);
-        backLeftMotor.setPower(wheels.backLeft);
-        backRightMotor.setPower(wheels.backRight);
+        moveMecanum(inputY, inputX, inputC, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+    }
+
+    // y - forwards
+    // x - side
+    // c - rotation
+    public void moveMecanum(double y, double x, double c, DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight) {
+        double leftFrontVal = y + x + c;
+        double rightFrontVal = y - x - c;
+        double leftBackVal = y - x + c;
+        double rightBackVal = y + x - c;
+
+        //Move range to between 0 and +1, if not already
+        double[] wheelPowers = {rightFrontVal, leftFrontVal, leftBackVal, rightBackVal};
+        Arrays.sort(wheelPowers);
+        if (wheelPowers[3] > 1) {
+            leftFrontVal /= wheelPowers[3];
+            rightFrontVal /= wheelPowers[3];
+            leftBackVal /= wheelPowers[3];
+            rightBackVal /= wheelPowers[3];
+        }
+        double scaledPower = SCALEDPOWER;
+
+        frontLeft.setPower(leftFrontVal*scaledPower+frontLeft.getPower()*(1-scaledPower));
+        frontRight.setPower(rightFrontVal*scaledPower+frontRight.getPower()*(1-scaledPower));
+        backLeft.setPower(leftBackVal*scaledPower+backLeft.getPower()*(1-scaledPower));
+        backRight.setPower(rightBackVal*scaledPower+backRight.getPower()*(1-scaledPower));
     }
 
     /*
@@ -111,4 +134,5 @@ public class MecanumTeleOp extends OpMode
     @Override
     public void stop() {
     }
+
 }
