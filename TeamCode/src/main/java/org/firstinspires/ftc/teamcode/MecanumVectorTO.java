@@ -51,7 +51,7 @@ public class MecanumVectorTO extends OpMode
     private DcMotor backLeftMotor = null;
     private DcMotor backRightMotor = null;
 
-    // private static final double TRIGGERTHRESHOLD = .2;
+    // private static final double TRIGGERTHR`ESHOLD = .2;
     private static final double ACCEPTINPUTTHRESHOLD = .15;
     private static final double SCALEDPOWER = 1; //Emphasis on current controller reading (vs current motor power) on the drive train
 
@@ -63,10 +63,10 @@ public class MecanumVectorTO extends OpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        frontLeftMotor  = hardwareMap.get(DcMotor.class, "front_left_drive");
-        frontRightMotor = hardwareMap.get(DcMotor.class, "front_right_drive");
-        backLeftMotor = hardwareMap.get(DcMotor.class, "rear_left_drive");
-        backRightMotor = hardwareMap.get(DcMotor.class, "rear_right_drive");
+        frontLeftMotor  = hardwareMap.get(DcMotor.class, "FL");
+        frontRightMotor = hardwareMap.get(DcMotor.class, "FR");
+        backLeftMotor = hardwareMap.get(DcMotor.class, "RL");
+        backRightMotor = hardwareMap.get(DcMotor.class, "RR");
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
