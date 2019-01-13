@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -37,6 +37,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.vuforia.Vuforia;
+
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.teamcode.vision.MasterVision;
+import org.firstinspires.ftc.teamcode.vision.SampleRandomizedPositions;
 
 /*
 VUFORIA KEY:
@@ -54,9 +59,12 @@ public class TestAutonomous extends LinearOpMode {
     private DcMotor backLeftMotor = null;
     private DcMotor backRightMotor = null;
 
+    MasterVision vision;
+    SampleRandomizedPositions goldPosition;
+
     @Override
-    public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
+    public void runOpMode() throws InterruptedException {
+        telemetry.addData("Status", "Autonomous Initialized");
         telemetry.update();
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -72,14 +80,47 @@ public class TestAutonomous extends LinearOpMode {
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;// recommended camera direction
+        parameters.vuforiaLicenseKey = "ATsQBJ//////AAABmWTX7RRHP0rNtHOPB8fJqA8BK0Sxs7V8T8w1X7GKyV3W4JP72rEQHIaor5bYEMC2WNnVQOhU0l1yZGynqMyilPgemnYL/mjLZlag95PHc+85Qbo0YvSmHrLWwciBneUbMDcN+LAjUJt+ziY6cW52fHG1ID/r7qZJZJ+DQQly94h9AscUQcONOFKv3Cnv0/WX+IVb1VyhHn8aHKbLK/+2V+LewA1I3jw8wJ72g0KTAolCPWmtk1st5WQRcuTlZHCqt55HXa7ih8kTeiLzQmOE2hRmATzQku6L+Bud3VMoSIJ+4AUoIRXZ1C04ic7NkkKDbgsE5dRz5HyBvEtlReA/+qGeKy2amqXTdHjlNknwa7lq";
+
+        vision = new MasterVision(parameters, hardwareMap, true, MasterVision.TFLiteAlgorithm.INFER_NONE);
+        vision.init();// enables the camera overlay. this will take a couple of seconds
+        vision.enable();// enables the tracking algorithms. this might also take a little time
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        runtime.reset();
+        //runtime.reset();
+
+        vision.disable();// disables tracking algorithms. this will free up your phone's processing power for other jobs.
+        goldPosition = vision.getTfLite().getLastKnownSampleOrder();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            telemetry.addData("goldPosition was", goldPosition);// giving feedback
+
+            switch (goldPosition){ // using for things in the autonomous program
+                case LEFT:
+                    telemetry.addLine("going to the left");
+                    // code goes here
+                    break;
+                case CENTER:
+                    telemetry.addLine("going straight");
+                    // code goes here
+                    break;
+                case RIGHT:
+                    telemetry.addLine("going to the right");
+                    // code goes here
+                    break;
+                case UNKNOWN:
+                    telemetry.addLine("staying put");
+                    // code goes here
+                    break;
+            }
+
             telemetry.update();
             // idle(); To be called at the bottom of while (opModeIsActive()) loop
         }
+        vision.shutdown();
     }
 }
