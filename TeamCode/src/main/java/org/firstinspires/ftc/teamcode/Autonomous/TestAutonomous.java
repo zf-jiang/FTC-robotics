@@ -123,4 +123,33 @@ public class TestAutonomous extends LinearOpMode {
         }
         vision.shutdown();
     }
+
+    public void DriveForward(double power){
+
+    }
+
+    public void DriveBackward(double power){
+
+    }
+
+    public void StopDriving(){
+
+    }
+
+    public void TurnRight(double power){
+
+    }
+
+    public void TurnLeft(double power){
+
+    }
+
+    public void RaiseMarkerArm(){
+
+    }
+
+    public void LowerMarkerArm(){
+
+    }
+
 }
