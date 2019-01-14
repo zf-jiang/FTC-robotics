@@ -136,6 +136,21 @@ public class TestAutonomous extends LinearOpMode {
 
     }
 
+    public void AimLeftMineral(){
+        // Turn left a certain degrees
+        // requires testing
+    }
+
+    public void AimRightMineral(){
+        // Turn right a certain degrees
+        // requires testing
+    }
+
+    public void AimMiddleMineral(){
+        // Do we need any turning at all?
+        // requires testing
+    }
+
     public void TurnRight(double power){
 
     }
